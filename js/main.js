@@ -10,7 +10,6 @@
 
   const state = { area: 'all', origin: 'all', lastTrigger: null };
 
-  /* ---------- Navegação ---------- */
   function initNav() {
     const toggle = $('[data-nav-toggle]');
     const menu = $('[data-nav-menu]');
@@ -54,7 +53,6 @@
     sections.forEach((s) => observer.observe(s));
   }
 
-  /* ---------- Projetos ---------- */
   function statusBadge(status) {
     return `<span class="status status--${status.tone}">${escapeHTML(status.label)}</span>`;
   }
@@ -63,6 +61,8 @@
     if (!items || !items.length) return '';
     return `<ul class="chips" aria-label="${label}">${items.map((s) => `<li>${escapeHTML(s)}</li>`).join('')}</ul>`;
   }
+
+  const textMode = () => (Portfolio.config && Portfolio.config.textCards) || 'ilustracao';
 
   function groupOf(p) {
     return Portfolio.groups.find((g) => g.id === p.group);
@@ -83,6 +83,7 @@
     return `
       <article class="${classes}" data-id="${p.id}" role="listitem" style="--accent:${color};view-transition-name:card-${p.id}">
         ${hasImage ? `<div class="card__visual">${Portfolio.renderVisual(p)}</div>` : ''}
+        ${!hasImage && textMode() === 'ilustracao' ? `<div class="card__visual card__visual--art">${Portfolio.renderIllustration(p)}</div>` : ''}
         <div class="card__body">
           <div class="card__meta">
             ${originBadge(p)}
@@ -99,7 +100,6 @@
       </article>`;
   }
 
-  // Ordem do carrossel: destaques primeiro, depois projetos com imagem, depois só texto.
   function rank(p) {
     if (p.featured) return 0;
     return p.cover ? 1 : 2;
@@ -113,10 +113,37 @@
   const matches = (p, area = state.area, origin = state.origin) =>
     (area === 'all' || p.categories.includes(area)) && (origin === 'all' || p.group === origin);
 
+  function renderTrack() {
+    const track = $('[data-carousel-track]');
+    const list = ordered.filter((p) => matches(p));
+    if (textMode() !== 'empilhado') {
+      track.innerHTML = list.map(cardTemplate).join('');
+      return list.length;
+    }
+    let html = '';
+    let pending = [];
+    const flush = () => {
+      if (pending.length) html += `<div class="card-stack">${pending.map(cardTemplate).join('')}</div>`;
+      pending = [];
+    };
+    list.forEach((p) => {
+      if (p.cover) {
+        flush();
+        html += cardTemplate(p);
+      } else {
+        pending.push(p);
+        if (pending.length === 2) flush();
+      }
+    });
+    flush();
+    track.innerHTML = html;
+    return list.length;
+  }
+
   function renderProjects() {
     const track = $('[data-carousel-track]');
     if (!track) return;
-    track.innerHTML = ordered.map(cardTemplate).join('');
+    document.documentElement.dataset.textCards = textMode();
 
     track.addEventListener('click', (e) => {
       const trigger = e.target.closest('[data-open]');
@@ -126,7 +153,6 @@
     initCarousel();
   }
 
-  /* ---------- Carrossel ---------- */
   function updateCarousel() {
     const track = $('[data-carousel-track]');
     const wrap = $('[data-carousel]');
@@ -143,7 +169,6 @@
   function initCarousel() {
     const track = $('[data-carousel-track]');
     const step = (dir) => {
-      // Avança quase uma tela de cards por clique.
       track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: reduceMotion() ? 'auto' : 'smooth' });
     };
     $('[data-carousel-prev]').addEventListener('click', () => step(-1));
@@ -163,7 +188,6 @@
     updateCarousel();
   }
 
-  /* ---------- Filtros ---------- */
   const ORIGINS = () => [{ id: 'all', title: 'Todos', color: '#121A2E' }, ...Portfolio.groups];
 
   function filterButton(kind, id, label, color, pressed) {
@@ -198,8 +222,6 @@
     updateCounts();
   }
 
-  // Cada contador mostra quantos projetos aparecem se aquele botão for escolhido,
-  // mantendo o outro filtro como está.
   function updateCounts() {
     $$('[data-origin]').forEach((b) => {
       $('[data-count]', b).textContent = Portfolio.projects.filter((p) => matches(p, state.area, b.dataset.origin)).length;
@@ -217,12 +239,7 @@
       $$('[data-origin]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.origin === state.origin)));
       $$('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === state.area)));
 
-      let shown = 0;
-      $$('.card').forEach((card) => {
-        const match = matches(Portfolio.projects.find((p) => p.id === card.dataset.id));
-        card.hidden = !match;
-        if (match) shown += 1;
-      });
+      const shown = renderTrack();
 
       updateCounts();
       const track = $('[data-carousel-track]');
@@ -246,9 +263,7 @@
     else update();
   }
 
-  /* ---------- Modal ---------- */
   function modalTemplate(p) {
-    // Anterior e próximo seguem a mesma ordem e os mesmos filtros do carrossel.
     const list = ordered.filter((x) => matches(x)).includes(p) ? ordered.filter((x) => matches(x)) : ordered;
     const index = list.indexOf(p);
     const prev = list[(index - 1 + list.length) % list.length];
@@ -322,12 +337,12 @@
     if (!modal) return;
 
     $('[data-modal-close]', modal).addEventListener('click', closeProject);
-    // Clique no fundo escuro fecha o modal.
+
     modal.addEventListener('click', (e) => {
       if (e.target === modal) closeProject();
       const step = e.target.closest('[data-open-step]');
       if (step) openProject(step.dataset.openStep);
-      // Galeria: troca a imagem principal pela tela escolhida.
+
       const thumb = e.target.closest('[data-gallery-src]');
       if (thumb) {
         const main = $('.detail__visual img', modal);
@@ -355,7 +370,6 @@
     fromHash();
   }
 
-  /* ---------- Experiência e competências ---------- */
   function renderExperience() {
     const list = $('[data-exp-list]');
     if (!list) return;
@@ -392,7 +406,6 @@
       .join('');
   }
 
-  /* ---------- Contato ---------- */
   function renderContact() {
     const { email, links } = Portfolio.config;
     const address = $('[data-contact-email]');
@@ -438,7 +451,6 @@
       .join('');
   }
 
-  /* ---------- Início ---------- */
   function init() {
     try {
       initNav();
@@ -450,7 +462,7 @@
       renderContact();
       initModal();
       Portfolio.interactions.initHeader();
-      // Link da experiência: mostra só os projetos do estágio.
+
       $$('[data-origin-link]').forEach((link) =>
         link.addEventListener('click', () => setFilters({ origin: link.dataset.originLink, area: 'all' }, true))
       );
@@ -463,7 +475,6 @@
       if (year) year.textContent = new Date().getFullYear();
       document.documentElement.classList.add('is-ready');
     } catch (err) {
-      // Mantém o conteúdo estático visível mesmo se algo falhar.
       console.error('Falha ao iniciar o portfólio:', err);
     }
   }

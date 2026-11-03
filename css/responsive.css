@@ -1,17 +1,10 @@
-/* ==========================================================================
-   Responsividade
-   ========================================================================== */
-
-/* Notebooks e tablets em paisagem */
 @media (max-width: 1080px) {
-
   .skills__grid { grid-template-columns: repeat(3, minmax(0, 1fr)); }
   .job__areas { grid-template-columns: repeat(2, minmax(0, 1fr)); }
   .about__grid { grid-template-columns: 1fr 1.6fr; }
   .about__facts { grid-column: 1 / -1; grid-template-columns: repeat(3, 1fr); }
 }
 
-/* Tablets */
 @media (max-width: 860px) {
   :root { --space-6: 5rem; }
 
@@ -115,7 +108,6 @@
   .detail__visual .visual { aspect-ratio: 16 / 10; }
 }
 
-/* Celulares */
 @media (max-width: 640px) {
   :root {
     --space-4: 1.75rem;
@@ -147,7 +139,8 @@
 
   .contact__inner { padding: var(--space-4) var(--space-3); }
 
-  .card { flex-basis: 82vw; }
+  .card,
+  .card-stack { flex-basis: 82vw; }
   .card--feature { flex-basis: 86vw; }
   .carousel__btn { width: 40px; height: 40px; }
   .filter-panel { padding: var(--space-2); }
@@ -169,7 +162,6 @@
   .detail__step:last-child { text-align: left; }
 }
 
-/* Telas largas: um pouco mais de respiro na grade */
 @media (min-width: 1400px) {
   :root { --container: 1280px; }
 }

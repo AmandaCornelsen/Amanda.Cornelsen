@@ -1,8 +1,3 @@
-/* ==========================================================================
-   Componentes: botões, selos, filtros, mapa, cards, telas e modal
-   ========================================================================== */
-
-/* ---------- Botões ---------- */
 .btn {
   display: inline-flex;
   align-items: center;
@@ -60,7 +55,6 @@
   color: var(--paper);
 }
 
-/* ---------- Chips e selos ---------- */
 .chips {
   display: flex;
   flex-wrap: wrap;
@@ -108,7 +102,6 @@
   border: 1.5px dashed currentColor;
 }
 
-/* Nível de familiaridade: três segmentos, sem porcentagem. */
 .level {
   display: inline-flex;
   gap: 3px;
@@ -128,7 +121,6 @@
   background: var(--c, var(--cobalt));
 }
 
-/* ---------- Filtros ---------- */
 .filters {
   display: flex;
   flex-wrap: wrap;
@@ -201,7 +193,6 @@
   color: var(--slate);
 }
 
-/* ---------- Mapa de áreas (hero) ---------- */
 .graph {
   width: 100%;
   height: auto;
@@ -289,7 +280,6 @@
   stroke-width: 3;
 }
 
-/* Ao focar uma área, os projetos ligados a ela se destacam. */
 .graph[class*='is-focus-'] .graph__leaf-line,
 .graph[class*='is-focus-'] .graph__cross {
   stroke-opacity: 0.06;
@@ -319,7 +309,6 @@
   stroke-opacity: 0.45;
 }
 
-/* ---------- Cards de projeto ---------- */
 .card {
   position: relative;
   display: flex;
@@ -337,13 +326,11 @@
   display: none;
 }
 
-/* Projetos em destaque ocupam mais espaço no carrossel. */
 .card--feature {
   flex-basis: 560px;
   border-radius: var(--radius-l);
 }
 
-/* Faixa colorida no topo de cada card: a cor indica a área do projeto. */
 .card::before {
   content: '';
   position: absolute;
@@ -358,7 +345,6 @@
   box-shadow: 0 24px 50px -24px color-mix(in srgb, var(--accent) 70%, transparent);
 }
 
-/* Cards sem imagem: só texto, com a cor da área ao fundo. */
 .card--text {
   background:
     radial-gradient(circle at 105% -10%, color-mix(in srgb, var(--accent) 28%, transparent) 0 32%, transparent 33%),
@@ -403,7 +389,6 @@
   overflow: hidden;
 }
 
-
 .card__body {
   display: flex;
   flex-direction: column;
@@ -411,8 +396,6 @@
   padding: var(--space-3);
   flex: 1;
 }
-
-
 
 .card__meta {
   display: flex;
@@ -455,7 +438,6 @@
   padding-top: 0.4rem;
 }
 
-/* O botão cobre o card inteiro para facilitar o clique. */
 .card__open {
   align-self: flex-start;
   margin-top: 0.4rem;
@@ -488,7 +470,6 @@
   outline-offset: 3px;
 }
 
-/* ---------- Redes sociais ---------- */
 .social {
   display: inline-flex;
   align-items: center;
@@ -507,7 +488,6 @@
   color: var(--cobalt);
 }
 
-/* ---------- Modal ---------- */
 .project-modal {
   width: min(100% - 2rem, 1080px);
   max-height: min(100% - 2rem, 860px);
@@ -710,7 +690,6 @@
   color: var(--ink);
 }
 
-/* ---------- Fotos reais ---------- */
 .visual {
   position: relative;
   height: 100%;
@@ -767,7 +746,6 @@
   font-weight: 600;
 }
 
-/* Prints de celular e diagramas não são cortados. */
 .visual--phone,
 .visual--contain {
   display: grid;
@@ -809,7 +787,6 @@
   object-fit: contain;
 }
 
-
 .job__link {
   display: inline-block;
   margin-top: var(--space-3);
@@ -823,7 +800,6 @@
   color: var(--cobalt);
 }
 
-/* Detalhes sem imagem: uma coluna, com faixa colorida no topo. */
 .detail--text {
   grid-template-columns: 1fr;
   border-top: 8px solid var(--accent);
@@ -837,7 +813,6 @@
   padding-top: var(--space-4);
 }
 
-/* ---------- Carrossel por grupo ---------- */
 .carousel__nav {
   flex-shrink: 0;
 }
@@ -879,7 +854,6 @@
   position: relative;
 }
 
-/* Esmaecido na borda indica que há mais cards para o lado. */
 .carousel::before,
 .carousel::after {
   content: '';
@@ -912,7 +886,7 @@
   display: flex;
   align-items: stretch;
   gap: var(--space-3);
-  /* Espaço para a sombra e o movimento do hover não serem cortados. */
+
   padding: 10px 4px 24px;
   margin: -10px -4px -24px;
   overflow-x: auto;
@@ -931,8 +905,6 @@
   outline-offset: 2px;
 }
 
-
-/* ---------- Painel de filtros ---------- */
 .projects {
   --group: var(--violet);
 }
@@ -994,7 +966,6 @@
   display: none;
 }
 
-/* Origem do projeto no card (estágio, faculdade ou pessoal). */
 .card__origin {
   padding: 0.2rem 0.65rem;
   border-radius: 999px;
@@ -1014,4 +985,128 @@
 .card__type + .card__title,
 .card__type + .detail__title {
   margin-top: -0.3rem;
+}
+
+.card__visual--art {
+  display: grid;
+  place-items: center;
+  padding: 6% 10%;
+  background:
+    radial-gradient(circle at 85% 15%, color-mix(in srgb, var(--accent) 30%, transparent), transparent 50%),
+    radial-gradient(circle at 10% 100%, color-mix(in srgb, var(--accent) 22%, transparent), transparent 55%),
+    color-mix(in srgb, var(--accent) 10%, var(--paper));
+}
+
+.visual--illustration {
+  display: grid;
+  place-items: center;
+  height: 100%;
+  width: 100%;
+  color: color-mix(in srgb, var(--accent) 85%, black);
+}
+
+.illustration {
+  width: 100%;
+  max-height: 100%;
+  overflow: visible;
+}
+
+.il-card {
+  fill: var(--paper);
+  stroke: color-mix(in srgb, var(--accent) 35%, white);
+  stroke-width: 2;
+}
+
+.il-soft {
+  fill: color-mix(in srgb, var(--accent) 18%, white);
+}
+
+.il-mid {
+  fill: color-mix(in srgb, var(--accent) 45%, white);
+}
+
+.il-solid {
+  fill: var(--accent);
+}
+
+.il-alert {
+  fill: #f59e0b;
+}
+
+.il-line,
+.il-soft-line,
+.il-check,
+.il-pulse {
+  fill: none;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+  stroke-width: 5;
+}
+
+.il-line {
+  stroke: currentColor;
+}
+
+.il-soft-line {
+  stroke: color-mix(in srgb, var(--accent) 30%, white);
+  stroke-width: 10;
+}
+
+.il-check {
+  stroke: var(--paper);
+  stroke-width: 3;
+}
+
+.il-check.il-thick {
+  stroke: var(--accent);
+  stroke-width: 8;
+}
+
+.il-pulse {
+  stroke: color-mix(in srgb, var(--accent) 55%, white);
+  stroke-width: 4;
+}
+
+.il-thick {
+  stroke-width: 8;
+}
+
+.card:hover .illustration {
+  transform: scale(1.04);
+}
+
+.illustration {
+  transition: transform 0.5s var(--ease);
+}
+
+.card-stack {
+  display: flex;
+  flex: 0 0 340px;
+  flex-direction: column;
+  gap: var(--space-3);
+  scroll-snap-align: start;
+}
+
+.card-stack .card {
+  flex: 1 1 0;
+}
+
+.card-stack .card--text .card__body {
+  gap: 0.5rem;
+  padding: var(--space-3);
+}
+
+.card-stack .card--text .card__title {
+  font-size: 1.35rem;
+}
+
+.card-stack .card__text {
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-stack .chips {
+  margin-top: auto;
 }

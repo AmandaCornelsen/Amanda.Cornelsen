@@ -21,7 +21,6 @@
     const areas = Portfolio.categories.filter((c) => c.id !== 'all');
     const shortLabels = { ia: 'IA', dev: 'Desenvolvimento', dados: 'Dados', automacao: 'Automação', seguranca: 'Segurança', negocios: 'Negócios', iot: 'IoT' };
 
-    // Degradê do nó central.
     const defs = el('defs');
     const grad = el('linearGradient', { id: 'core-gradient', x1: '0', y1: '0', x2: '1', y2: '1' });
     [['0', '#3A2EE8'], ['0.55', '#7C4DFF'], ['1', '#F43F5E']].forEach(([o, c]) => grad.appendChild(el('stop', { offset: o, 'stop-color': c })));
@@ -45,7 +44,6 @@
     });
     const byId = Object.fromEntries(areaNodes.map((n) => [n.area.id, n]));
 
-    // Projetos como pontos orbitando a área principal.
     const leaves = Portfolio.projects.map((project, i) => {
       const home = byId[project.categories[0]];
       const siblings = Portfolio.projects.filter((p) => p.categories[0] === project.categories[0]);
@@ -68,7 +66,6 @@
       n.spoke = layer.edges.appendChild(el('line', { class: 'graph__spoke' }));
     });
 
-    // Nó central.
     const core = el('g', { class: 'graph__core', transform: `translate(${cx} ${cy})` });
     core.appendChild(el('circle', { r: 44 }));
     const coreText = el('text', { 'text-anchor': 'middle', dy: '0.35em' });
@@ -166,7 +163,7 @@
     const progress = document.querySelector('[data-progress]');
     const update = () => {
       header.classList.toggle('is-scrolled', window.scrollY > 12);
-      // Barra de progresso da leitura no topo.
+
       if (progress) {
         const max = document.documentElement.scrollHeight - window.innerHeight;
         progress.style.transform = `scaleX(${max > 0 ? Math.min(window.scrollY / max, 1) : 0})`;

@@ -29,7 +29,7 @@
   const img = (file, alt, caption) => ({ src: `assets/projects/${file}.webp`, alt, caption });
 
   Portfolio.projects = [
-    /* ===================== ESTÁGIO ===================== */
+
     {
       id: 'interagente',
       featured: true,
@@ -171,8 +171,6 @@
       disclaimer: 'A representação usa nomes e dados fictícios.',
       links: []
     },
-
-    /* ===================== FACULDADE ===================== */
 
     {
       id: 'cortex',
@@ -588,7 +586,6 @@
       links: [{ label: 'Ver repositório', url: 'https://github.com/AmandaCornelsen/CP2_Cripto_Android' }]
     },
 
-    /* ===================== PESSOAL ===================== */
     {
       id: 'numero-secreto',
       group: 'pessoal',
