@@ -76,14 +76,40 @@
       <div class="container">
         <div class="section__head">
           <h2 class="section__title" id="projects-title">Projetos</h2>
-          <p class="section__intro">Separados por estágio, faculdade e projetos pessoais. Cada cor representa uma área: use os filtros para ver só a que interessa.</p>
+          <p class="section__intro">Combine os filtros de origem e de área. Use as setas para ver mais projetos.</p>
         </div>
 
-        <div class="filters" role="toolbar" aria-label="Filtrar projetos por área" data-filters></div>
-        <p class="filters__status" aria-live="polite" data-filter-status></p>
+        <div class="filter-panel">
+          <div class="filter-row">
+            <span class="filter-row__label" id="filter-origin-label">Origem</span>
+            <div class="filters" role="toolbar" aria-labelledby="filter-origin-label" data-filters-origin></div>
+          </div>
+          <div class="filter-row">
+            <span class="filter-row__label" id="filter-area-label">Área</span>
+            <div class="filters" role="toolbar" aria-labelledby="filter-area-label" data-filters></div>
+          </div>
+        </div>
 
-        <div class="project-groups" data-project-grid></div>
+        <div class="carousel-bar">
+          <p class="filters__status" aria-live="polite" data-filter-status></p>
+          <div class="carousel__nav" data-carousel-nav>
+            <button class="carousel__btn" type="button" data-carousel-prev aria-label="Ver projetos anteriores">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M15 5l-7 7 7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+            <button class="carousel__btn" type="button" data-carousel-next aria-label="Ver mais projetos">
+              <svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="M9 5l7 7-7 7" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            </button>
+          </div>
+        </div>
 
+        <div class="carousel" data-carousel>
+          <div class="carousel__track" role="list" tabindex="0" aria-label="Projetos" data-carousel-track></div>
+        </div>
+
+        <div class="carousel-empty" data-carousel-empty hidden>
+          <p>Nenhum projeto com essa combinação de filtros.</p>
+          <button class="btn btn--ghost" type="button" data-clear-filters>Limpar filtros</button>
+        </div>
       </div>
     </section>
 
@@ -129,7 +155,7 @@
           </header>
           <p class="job__summary">Passei pelas squads de saúde, utilities e IA. Participo de projetos conduzidos em equipe e com parceiros.</p>
           <ul class="job__areas" data-exp-list></ul>
-          <a class="job__link" href="#estagio">Ver os projetos do estágio</a>
+          <a class="job__link" href="#projetos" data-origin-link="estagio">Ver os projetos do estágio</a>
         </article>
       </div>
     </section>

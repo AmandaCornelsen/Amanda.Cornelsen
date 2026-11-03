@@ -710,63 +710,6 @@
   color: var(--ink);
 }
 
-/* ---------- Grupos de projetos ---------- */
-.project-groups {
-  display: grid;
-  gap: var(--space-5);
-}
-
-.project-group {
-  min-width: 0;
-}
-
-.project-group[hidden] {
-  display: none;
-}
-
-.project-group__head {
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.5rem 1rem;
-  margin-bottom: var(--space-3);
-  padding-bottom: var(--space-2);
-  border-bottom: 3px solid var(--group);
-}
-
-.project-group__title::before {
-  content: '';
-  display: inline-block;
-  width: 0.55em;
-  height: 0.55em;
-  margin-right: 0.35em;
-  border-radius: 50%;
-  background: var(--group);
-  vertical-align: 0.08em;
-}
-
-.project-group__count {
-  padding: 0.2rem 0.7rem;
-  border-radius: 999px;
-  background: var(--group);
-  color: var(--paper);
-  font-size: 0.8rem;
-  font-weight: 600;
-}
-
-.project-group__title {
-  font-family: var(--font-display);
-  font-size: var(--step-3);
-  font-weight: 800;
-  letter-spacing: -0.03em;
-  line-height: 1;
-}
-
-.project-group__subtitle {
-  color: var(--slate);
-}
-
 /* ---------- Fotos reais ---------- */
 .visual {
   position: relative;
@@ -895,19 +838,6 @@
 }
 
 /* ---------- Carrossel por grupo ---------- */
-.project-group__label {
-  display: flex;
-  flex: 1;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.5rem 1rem;
-  min-width: 0;
-}
-
-.project-group__head {
-  flex-wrap: nowrap;
-}
-
 .carousel__nav {
   flex-shrink: 0;
 }
@@ -1001,6 +931,87 @@
   outline-offset: 2px;
 }
 
-.project-groups {
-  gap: var(--space-5);
+
+/* ---------- Painel de filtros ---------- */
+.projects {
+  --group: var(--violet);
+}
+
+.filter-panel {
+  display: grid;
+  gap: 0.75rem;
+  padding: var(--space-2) var(--space-3);
+  border-radius: var(--radius-m);
+  background: rgba(255, 255, 255, 0.7);
+  box-shadow: 0 10px 30px -24px rgba(29, 35, 92, 0.4);
+}
+
+.filter-row {
+  display: grid;
+  grid-template-columns: 4.5rem minmax(0, 1fr);
+  align-items: start;
+  gap: 0.75rem;
+}
+
+.filter-row__label {
+  padding-top: 0.6rem;
+  font-size: var(--step--1);
+  font-weight: 600;
+  color: var(--slate);
+}
+
+.carousel-bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-2);
+  margin: var(--space-3) 0 var(--space-2);
+}
+
+.carousel-bar .filters__status {
+  min-height: 0;
+  margin: 0;
+  font-weight: 600;
+  color: var(--ink-soft);
+}
+
+.carousel[hidden],
+.carousel__nav[hidden] {
+  display: none;
+}
+
+.carousel-empty {
+  display: grid;
+  justify-items: start;
+  gap: var(--space-2);
+  padding: var(--space-4);
+  border: 2px dashed var(--line);
+  border-radius: var(--radius-m);
+  color: var(--ink-soft);
+}
+
+.carousel-empty[hidden] {
+  display: none;
+}
+
+/* Origem do projeto no card (estágio, faculdade ou pessoal). */
+.card__origin {
+  padding: 0.2rem 0.65rem;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--group) 14%, white);
+  color: color-mix(in srgb, var(--group) 80%, black);
+  font-size: 0.78rem;
+  font-weight: 600;
+}
+
+.card__type {
+  margin-top: 0.2rem;
+  font-size: 0.82rem;
+  font-weight: 500;
+  color: color-mix(in srgb, var(--accent) 70%, black);
+}
+
+.card__type + .card__title,
+.card__type + .detail__title {
+  margin-top: -0.3rem;
 }

@@ -44,6 +44,7 @@ python -m http.server 8000
 |---|---|
 | `id` | Identificador único; também abre o projeto direto pelo endereço (`index.html#cortex`) |
 | `categories` | Filtros em que o projeto aparece: `dev`, `ia`, `dados`, `automacao`, `seguranca`, `iot` |
+| `group` | Origem usada no filtro: `estagio`, `faculdade` ou `pessoal` |
 | `featured` | `true` coloca o projeto na frente do carrossel, com card maior |
 | `status` | Texto do selo e tom: `live`, `progress`, `academic` ou `concept` |
 | `visual` | Qual tela demonstrativa usar (ver `js/visuals.js`) |

@@ -8,7 +8,7 @@
   const escapeHTML = (str) =>
     String(str).replace(/[&<>"']/g, (c) => ({ '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c]));
 
-  const state = { filter: 'all', lastTrigger: null };
+  const state = { area: 'all', origin: 'all', lastTrigger: null };
 
   /* ---------- Navegação ---------- */
   function initNav() {
@@ -64,6 +64,15 @@
     return `<ul class="chips" aria-label="${label}">${items.map((s) => `<li>${escapeHTML(s)}</li>`).join('')}</ul>`;
   }
 
+  function groupOf(p) {
+    return Portfolio.groups.find((g) => g.id === p.group);
+  }
+
+  function originBadge(p) {
+    const g = groupOf(p);
+    return `<span class="card__origin" style="--group:${g.color}">${escapeHTML(g.title)}</span>`;
+  }
+
   function cardTemplate(p) {
     const hasImage = Boolean(p.cover);
     const feature = hasImage && Boolean(p.featured);
@@ -76,9 +85,10 @@
         ${hasImage ? `<div class="card__visual">${Portfolio.renderVisual(p)}</div>` : ''}
         <div class="card__body">
           <div class="card__meta">
-            <span class="card__kind">${escapeHTML(p.kind)}</span>
+            ${originBadge(p)}
             ${statusBadge(p.status)}
           </div>
+          <p class="card__type">${escapeHTML(p.kind)}</p>
           <h3 class="card__title">${escapeHTML(p.name)}</h3>
           <p class="card__text">${escapeHTML(text)}</p>
           ${chipList(stack, 'Tecnologias')}
@@ -95,139 +105,154 @@
     return p.cover ? 1 : 2;
   }
 
-  const arrow = (dir) =>
-    `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${dir === 'prev' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+  const ordered = Portfolio.projects
+    .map((p, i) => ({ p, i }))
+    .sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i)
+    .map(({ p }) => p);
+
+  const matches = (p, area = state.area, origin = state.origin) =>
+    (area === 'all' || p.categories.includes(area)) && (origin === 'all' || p.group === origin);
 
   function renderProjects() {
-    const root = $('[data-project-grid]');
-    if (!root) return;
-    root.innerHTML = Portfolio.groups
-      .map((g) => {
-        const items = Portfolio.projects
-          .filter((p) => p.group === g.id)
-          .map((p, i) => ({ p, i }))
-          .sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i)
-          .map(({ p }) => p);
-        if (!items.length) return '';
-        return `
-          <section class="project-group" id="${g.id}" data-group="${g.id}" aria-labelledby="group-${g.id}" style="--group:${g.color}">
-            <header class="project-group__head">
-              <div class="project-group__label">
-                <h3 class="project-group__title" id="group-${g.id}">${escapeHTML(g.title)}</h3>
-                <span class="project-group__count" data-group-count>${items.length} projetos</span>
-                <p class="project-group__subtitle">${escapeHTML(g.subtitle)}</p>
-              </div>
-              <div class="carousel__nav">
-                <button class="carousel__btn" type="button" data-carousel-prev aria-label="Ver projetos anteriores de ${escapeHTML(g.title)}">${arrow('prev')}</button>
-                <button class="carousel__btn" type="button" data-carousel-next aria-label="Ver mais projetos de ${escapeHTML(g.title)}">${arrow('next')}</button>
-              </div>
-            </header>
-            <div class="carousel" data-carousel>
-              <div class="carousel__track" role="list" tabindex="0" aria-label="Projetos de ${escapeHTML(g.title)}">${items.map(cardTemplate).join('')}</div>
-            </div>
-          </section>`;
-      })
-      .join('');
+    const track = $('[data-carousel-track]');
+    if (!track) return;
+    track.innerHTML = ordered.map(cardTemplate).join('');
 
-    root.addEventListener('click', (e) => {
+    track.addEventListener('click', (e) => {
       const trigger = e.target.closest('[data-open]');
       if (trigger) openProject(trigger.dataset.open, trigger);
     });
 
-    initCarousels();
+    initCarousel();
   }
 
-  /* ---------- Carrosséis ---------- */
-  function updateCarousel(group) {
-    const track = $('.carousel__track', group);
+  /* ---------- Carrossel ---------- */
+  function updateCarousel() {
+    const track = $('[data-carousel-track]');
+    const wrap = $('[data-carousel]');
+    if (!track || !wrap) return;
     const max = track.scrollWidth - track.clientWidth;
     const atStart = track.scrollLeft <= 4;
     const atEnd = track.scrollLeft >= max - 4;
-    $('[data-carousel-prev]', group).disabled = atStart;
-    $('[data-carousel-next]', group).disabled = atEnd;
-    const wrap = $('[data-carousel]', group);
+    $('[data-carousel-prev]').disabled = atStart;
+    $('[data-carousel-next]').disabled = atEnd;
     wrap.classList.toggle('can-prev', !atStart);
     wrap.classList.toggle('can-next', !atEnd);
   }
 
-  function initCarousels() {
-    $$('[data-group]').forEach((group) => {
-      const track = $('.carousel__track', group);
-      const step = (dir) => {
-        // Avança quase uma tela de cards por clique.
-        track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: reduceMotion() ? 'auto' : 'smooth' });
-      };
-      $('[data-carousel-prev]', group).addEventListener('click', () => step(-1));
-      $('[data-carousel-next]', group).addEventListener('click', () => step(1));
-      track.addEventListener('keydown', (e) => {
-        if (e.target !== track) return;
-        if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
-        if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
-      });
-      let ticking = false;
-      track.addEventListener('scroll', () => {
-        if (ticking) return;
-        ticking = true;
-        requestAnimationFrame(() => { updateCarousel(group); ticking = false; });
-      }, { passive: true });
-      updateCarousel(group);
+  function initCarousel() {
+    const track = $('[data-carousel-track]');
+    const step = (dir) => {
+      // Avança quase uma tela de cards por clique.
+      track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: reduceMotion() ? 'auto' : 'smooth' });
+    };
+    $('[data-carousel-prev]').addEventListener('click', () => step(-1));
+    $('[data-carousel-next]').addEventListener('click', () => step(1));
+    track.addEventListener('keydown', (e) => {
+      if (e.target !== track) return;
+      if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+      if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
     });
-    window.addEventListener('resize', () => $$('[data-group]').forEach(updateCarousel));
+    let ticking = false;
+    track.addEventListener('scroll', () => {
+      if (ticking) return;
+      ticking = true;
+      requestAnimationFrame(() => { updateCarousel(); ticking = false; });
+    }, { passive: true });
+    window.addEventListener('resize', updateCarousel);
+    updateCarousel();
   }
 
   /* ---------- Filtros ---------- */
+  const ORIGINS = () => [{ id: 'all', title: 'Todos', color: '#121A2E' }, ...Portfolio.groups];
+
+  function filterButton(kind, id, label, color, pressed) {
+    return `<button class="filter" type="button" data-${kind}="${id}" aria-pressed="${pressed}" style="--c:${color}">
+      ${escapeHTML(label)}<span class="filter__count" data-count></span></button>`;
+  }
+
   function renderFilters() {
-    const bar = $('[data-filters]');
-    if (!bar) return;
-    bar.innerHTML = Portfolio.categories
-      .map((c) => {
-        const count = c.id === 'all' ? Portfolio.projects.length : Portfolio.projects.filter((p) => p.categories.includes(c.id)).length;
-        const color = (Portfolio.areaColors && Portfolio.areaColors[c.id]) || '#121A2E';
-        return `<button class="filter" type="button" data-filter="${c.id}" aria-pressed="${c.id === state.filter}" style="--c:${color}">
-          ${escapeHTML(c.label)}<span class="filter__count">${count}</span></button>`;
-      })
+    const originBar = $('[data-filters-origin]');
+    const areaBar = $('[data-filters]');
+    if (!originBar || !areaBar) return;
+
+    originBar.innerHTML = ORIGINS()
+      .map((g) => filterButton('origin', g.id, g.title, g.color, g.id === state.origin))
+      .join('');
+    areaBar.innerHTML = Portfolio.categories
+      .map((c) => filterButton('filter', c.id, c.label, (Portfolio.areaColors && Portfolio.areaColors[c.id]) || '#121A2E', c.id === state.area))
       .join('');
 
-    bar.addEventListener('click', (e) => {
+    originBar.addEventListener('click', (e) => {
+      const btn = e.target.closest('[data-origin]');
+      if (btn) setFilters({ origin: btn.dataset.origin });
+    });
+    areaBar.addEventListener('click', (e) => {
       const btn = e.target.closest('[data-filter]');
-      if (btn) applyFilter(btn.dataset.filter);
+      if (btn) setFilters({ area: btn.dataset.filter });
+    });
+
+    const clear = $('[data-clear-filters]');
+    if (clear) clear.addEventListener('click', () => setFilters({ area: 'all', origin: 'all' }));
+
+    updateCounts();
+  }
+
+  // Cada contador mostra quantos projetos aparecem se aquele botão for escolhido,
+  // mantendo o outro filtro como está.
+  function updateCounts() {
+    $$('[data-origin]').forEach((b) => {
+      $('[data-count]', b).textContent = Portfolio.projects.filter((p) => matches(p, state.area, b.dataset.origin)).length;
+    });
+    $$('[data-filter]').forEach((b) => {
+      $('[data-count]', b).textContent = Portfolio.projects.filter((p) => matches(p, b.dataset.filter, state.origin)).length;
     });
   }
 
-  function applyFilter(id) {
-    if (!Portfolio.categories.some((c) => c.id === id)) id = 'all';
-    state.filter = id;
+  function setFilters(next, instant = false) {
+    if (next.area !== undefined) state.area = Portfolio.categories.some((c) => c.id === next.area) ? next.area : 'all';
+    if (next.origin !== undefined) state.origin = ORIGINS().some((g) => g.id === next.origin) ? next.origin : 'all';
 
     const update = () => {
-      $$('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === id)));
+      $$('[data-origin]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.origin === state.origin)));
+      $$('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === state.area)));
+
       let shown = 0;
       $$('.card').forEach((card) => {
-        const project = Portfolio.projects.find((p) => p.id === card.dataset.id);
-        const match = id === 'all' || project.categories.includes(id);
+        const match = matches(Portfolio.projects.find((p) => p.id === card.dataset.id));
         card.hidden = !match;
         if (match) shown += 1;
       });
-      $$('[data-group]').forEach((group) => {
-        const visible = $$('.card', group).filter((c) => !c.hidden).length;
-        group.hidden = visible === 0;
-        $('[data-group-count]', group).textContent = `${visible} ${visible === 1 ? 'projeto' : 'projetos'}`;
-        $('.carousel__track', group).scrollLeft = 0;
-        updateCarousel(group);
-      });
-      const label = Portfolio.categories.find((c) => c.id === id).label;
+
+      updateCounts();
+      const track = $('[data-carousel-track]');
+      track.scrollLeft = 0;
+      $('[data-carousel]').hidden = shown === 0;
+      $('[data-carousel-empty]').hidden = shown !== 0;
+      $('[data-carousel-nav]').hidden = shown === 0;
+
+      const parts = [];
+      if (state.area !== 'all') parts.push(Portfolio.categories.find((c) => c.id === state.area).label);
+      if (state.origin !== 'all') parts.push(Portfolio.groups.find((g) => g.id === state.origin).title.toLowerCase());
       const status = $('[data-filter-status]');
-      if (status) status.textContent = id === 'all' ? '' : `${shown} ${shown === 1 ? 'projeto' : 'projetos'} em ${label}`;
+      if (status) {
+        const what = parts.length ? ` em ${parts.join(', ')}` : '';
+        status.textContent = `${shown} ${shown === 1 ? 'projeto' : 'projetos'}${what}`;
+      }
+      updateCarousel();
     };
 
-    if (document.startViewTransition && !reduceMotion()) document.startViewTransition(update);
+    if (!instant && document.startViewTransition && !reduceMotion()) document.startViewTransition(update);
     else update();
   }
 
   /* ---------- Modal ---------- */
   function modalTemplate(p) {
-    const index = Portfolio.projects.indexOf(p);
-    const prev = Portfolio.projects[(index - 1 + Portfolio.projects.length) % Portfolio.projects.length];
-    const next = Portfolio.projects[(index + 1) % Portfolio.projects.length];
+    // Anterior e próximo seguem a mesma ordem e os mesmos filtros do carrossel.
+    const list = ordered.filter((x) => matches(x)).includes(p) ? ordered.filter((x) => matches(x)) : ordered;
+    const index = list.indexOf(p);
+    const prev = list[(index - 1 + list.length) % list.length];
+    const next = list[(index + 1) % list.length];
     const links = p.links
       .map((l) => `<a class="btn btn--primary" href="${escapeHTML(l.url)}" target="_blank" rel="noopener noreferrer">${escapeHTML(l.label)}</a>`)
       .join('');
@@ -243,7 +268,8 @@
       <div class="detail${p.cover ? '' : ' detail--text'}" style="--accent:${Portfolio.colorOf(p)}">
         ${p.cover ? `<div class="detail__visual">${Portfolio.renderVisual(p)}</div>` : ''}
         <div class="detail__info">
-          <div class="card__meta"><span class="card__kind">${escapeHTML(p.kind)}</span>${statusBadge(p.status)}</div>
+          <div class="card__meta">${originBadge(p)}${statusBadge(p.status)}</div>
+          <p class="card__type">${escapeHTML(p.kind)}</p>
           <h2 class="detail__title" id="modal-title">${escapeHTML(p.name)}</h2>
           <p class="detail__context">${escapeHTML(p.context)}</p>
           <p class="detail__summary">${escapeHTML(p.summary)}</p>
@@ -418,13 +444,18 @@
       initNav();
       renderFilters();
       renderProjects();
+      setFilters({}, true);
       renderExperience();
       renderSkills();
       renderContact();
       initModal();
       Portfolio.interactions.initHeader();
+      // Link da experiência: mostra só os projetos do estágio.
+      $$('[data-origin-link]').forEach((link) =>
+        link.addEventListener('click', () => setFilters({ origin: link.dataset.originLink, area: 'all' }, true))
+      );
       Portfolio.interactions.initGraph((areaId) => {
-        applyFilter(areaId);
+        setFilters({ area: areaId });
         const target = $('#projetos');
         target.scrollIntoView({ behavior: reduceMotion() ? 'auto' : 'smooth', block: 'start' });
       });
