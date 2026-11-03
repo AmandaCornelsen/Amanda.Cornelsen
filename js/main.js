@@ -1,6 +1,3 @@
-/**
- * Inicialização do site: navegação, projetos, filtros, modal e contato.
- */
 (function (Portfolio) {
   'use strict';
 
@@ -37,7 +34,6 @@
       }
     });
 
-    // Destaca o link da seção visível.
     const links = $$('.nav__link');
     const sections = links.map((a) => $(a.getAttribute('href'))).filter(Boolean);
     if (!('IntersectionObserver' in window)) return;
@@ -158,7 +154,6 @@
       if (status) status.textContent = id === 'all' ? '' : `${shown} ${shown === 1 ? 'projeto' : 'projetos'} em ${label}`;
     };
 
-    // A transição de layout acompanha a ação do usuário, quando o navegador suporta.
     if (document.startViewTransition && !reduceMotion()) document.startViewTransition(update);
     else update();
   }
@@ -258,7 +253,6 @@
       if (state.lastTrigger && document.contains(state.lastTrigger)) state.lastTrigger.focus();
     });
 
-    // Abre o projeto indicado no endereço, ex.: index.html#cortex
     const fromHash = () => {
       const id = location.hash.slice(1);
       if (Portfolio.projects.some((p) => p.id === id)) {
@@ -325,7 +319,6 @@
           await navigator.clipboard.writeText(email);
           feedback.textContent = 'E-mail copiado.';
         } catch (err) {
-          // Sem permissão de área de transferência: seleciona o texto para cópia manual.
           const range = document.createRange();
           range.selectNodeContents(address);
           const sel = window.getSelection();
