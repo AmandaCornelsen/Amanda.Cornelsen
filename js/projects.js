@@ -344,6 +344,32 @@
       links: [{ label: 'Ver simulação', url: 'https://wokwi.com/projects/475905922847532033' }]
     },
     {
+      id: 'monitor-estoque',
+      group: 'faculdade',
+      name: 'Monitor de estoque em prateleiras',
+      kind: 'IoT / Arduino',
+      categories: ['iot'],
+      size: 'md',
+      accent: '#10B981',
+      cover: img('estoque-led-ligado', 'Simulação no Wokwi com dois sensores ultrassônicos, LEDs acesos e o monitor serial indicando estoque baixo'),
+      gallery: [
+        img('estoque-led-desligado', 'Simulação com os LEDs apagados', 'Estoque normal'),
+        img('estoque-led-ligado', 'Simulação com os LEDs acesos e alerta de estoque baixo', 'Alerta de estoque baixo')
+      ],
+      status: { label: 'Concluído', tone: 'academic' },
+      context: 'Atividade de Cognitive Computing, Computer Vision e IoT, FIAP, em trio',
+      problem: 'Saber quando uma prateleira está ficando vazia sem precisar conferir manualmente.',
+      summary: 'Dois sensores ultrassônicos medem a distância até os produtos e um LED acende quando o estoque da prateleira está baixo.',
+      role: 'Desenvolvimento em equipe do circuito e do código.',
+      highlights: [
+        'Um sensor HC-SR04 e um LED para cada prateleira',
+        'Três níveis de estoque pela distância medida: alto, médio e baixo',
+        'LED de alerta e mensagens no monitor serial a cada leitura'
+      ],
+      stack: ['Arduino', 'C++', 'HC-SR04', 'Wokwi'],
+      links: [{ label: 'Ver simulação', url: 'https://wokwi.com/projects/472736829962911745' }]
+    },
+    {
       id: 'seashield',
       group: 'faculdade',
       name: 'SeaShield Technology',
