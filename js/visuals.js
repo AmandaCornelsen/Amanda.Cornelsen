@@ -1,7 +1,3 @@
-/**
- * Imagem de capa dos projetos.
- * Projetos sem `cover` em projects.js aparecem como cards só de texto.
- */
 (function (Portfolio) {
   'use strict';
 
