@@ -62,6 +62,8 @@
     return `<ul class="chips" aria-label="${label}">${items.map((s) => `<li>${escapeHTML(s)}</li>`).join('')}</ul>`;
   }
 
+  const textMode = () => (Portfolio.config && Portfolio.config.textCards) || 'ilustracao';
+
   function groupOf(p) {
     return Portfolio.groups.find((g) => g.id === p.group);
   }
@@ -73,14 +75,14 @@
 
   function cardTemplate(p) {
     const hasImage = Boolean(p.cover);
-    const feature = hasImage && Boolean(p.featured);
-    const stack = p.stack.slice(0, feature ? 5 : 3);
-    const text = feature && p.problem ? p.problem : p.summary;
+    const stack = p.stack.slice(0, 3);
+    const text = p.summary;
     const color = Portfolio.colorOf(p);
-    const classes = ['card', feature ? 'card--feature' : 'card--standard', hasImage ? '' : 'card--text'].filter(Boolean).join(' ');
+    const classes = ['card', hasImage ? '' : textMode() === 'ilustracao' ? 'card--art' : 'card--text'].filter(Boolean).join(' ');
     return `
       <article class="${classes}" data-id="${p.id}" role="listitem" style="--accent:${color};view-transition-name:card-${p.id}">
         ${hasImage ? `<div class="card__visual">${Portfolio.renderVisual(p)}</div>` : ''}
+        ${!hasImage && textMode() === 'ilustracao' ? `<div class="card__visual card__visual--art">${Portfolio.renderIllustration(p)}</div>` : ''}
         <div class="card__body">
           <div class="card__meta">
             ${originBadge(p)}
@@ -110,10 +112,37 @@
   const matches = (p, area = state.area, origin = state.origin) =>
     (area === 'all' || p.categories.includes(area)) && (origin === 'all' || p.group === origin);
 
+  function renderTrack() {
+    const track = $('[data-carousel-track]');
+    const list = ordered.filter((p) => matches(p));
+    if (textMode() !== 'empilhado') {
+      track.innerHTML = list.map(cardTemplate).join('');
+      return list.length;
+    }
+    let html = '';
+    let pending = [];
+    const flush = () => {
+      if (pending.length) html += `<div class="card-stack">${pending.map(cardTemplate).join('')}</div>`;
+      pending = [];
+    };
+    list.forEach((p) => {
+      if (p.cover) {
+        flush();
+        html += cardTemplate(p);
+      } else {
+        pending.push(p);
+        if (pending.length === 2) flush();
+      }
+    });
+    flush();
+    track.innerHTML = html;
+    return list.length;
+  }
+
   function renderProjects() {
     const track = $('[data-carousel-track]');
     if (!track) return;
-    track.innerHTML = ordered.map(cardTemplate).join('');
+    document.documentElement.dataset.textCards = textMode();
 
     track.addEventListener('click', (e) => {
       const trigger = e.target.closest('[data-open]');
@@ -209,12 +238,7 @@
       $$('[data-origin]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.origin === state.origin)));
       $$('[data-filter]').forEach((b) => b.setAttribute('aria-pressed', String(b.dataset.filter === state.area)));
 
-      let shown = 0;
-      $$('.card').forEach((card) => {
-        const match = matches(Portfolio.projects.find((p) => p.id === card.dataset.id));
-        card.hidden = !match;
-        if (match) shown += 1;
-      });
+      const shown = renderTrack();
 
       updateCounts();
       const track = $('[data-carousel-track]');

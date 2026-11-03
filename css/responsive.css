@@ -139,8 +139,8 @@
 
   .contact__inner { padding: var(--space-4) var(--space-3); }
 
-  .card { flex-basis: 82vw; }
-  .card--feature { flex-basis: 86vw; }
+  .card,
+  .card-stack { flex-basis: 82vw; }
   .carousel__btn { width: 40px; height: 40px; }
   .filter-panel { padding: var(--space-2); }
   .filter-row { grid-template-columns: 1fr; gap: 0.4rem; }

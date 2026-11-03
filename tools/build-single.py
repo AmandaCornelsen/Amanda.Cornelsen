@@ -2,10 +2,10 @@ import re, pathlib
 root = pathlib.Path(__file__).resolve().parent.parent
 html = (root / 'index.html').read_text(encoding='utf-8')
 css = ''.join((root / f'css/{n}.css').read_text(encoding='utf-8') + '\n' for n in ['style', 'components', 'responsive'])
-html = re.sub(r'\s*<link rel="stylesheet" href="css/style.css">\s*<link rel="stylesheet" href="css/components.css">\s*<link rel="stylesheet" href="css/responsive.css">',
+html = re.sub(r'\s*<link rel="stylesheet" href="css/style.css[^"]*">\s*<link rel="stylesheet" href="css/components.css[^"]*">\s*<link rel="stylesheet" href="css/responsive.css[^"]*">',
               lambda m: '\n  <style>\n' + css + '  </style>', html)
 js = ''.join((root / f'js/{n}.js').read_text(encoding='utf-8') + '\n' for n in ['config', 'projects', 'visuals', 'interactions', 'main'])
-html = re.sub(r'\s*<script src="js/config.js"></script>.*?<script src="js/main.js"></script>',
+html = re.sub(r'\s*<script src="js/config.js[^"]*"></script>.*?<script src="js/main.js[^"]*"></script>',
               lambda m: '\n  <script>\n' + js.replace('</script', '<\\/script') + '  </script>', html, flags=re.S)
 import base64
 images = {f.stem: 'data:image/webp;base64,' + base64.b64encode(f.read_bytes()).decode() for f in (root / 'assets/projects').glob('*.webp')}
