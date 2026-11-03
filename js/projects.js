@@ -1,16 +1,3 @@
-/**
- * Conteúdo do portfólio: grupos, áreas, projetos, experiência e competências.
- *
- * group  → bloco onde o projeto aparece: 'estagio' | 'faculdade' | 'pessoal'
- * categories → áreas usadas nos filtros e no mapa do topo
- * size   → peso visual: 'xl' | 'full' | 'wide' | 'half' | 'lg' | 'md'
- * status.tone → 'live' (entregue/no ar) | 'progress' | 'academic' | 'concept'
- *
- * Imagens reais (opcional):
- *   cover: { src: 'assets/projects/arquivo.webp', alt: 'Descrição da tela' }
- *   gallery: [{ src: '...', alt: '...', caption: '...' }]
- * Quando `cover` existe, ela substitui a tela desenhada em código.
- */
 (function (Portfolio) {
   'use strict';
 
@@ -20,7 +7,6 @@
     { id: 'pessoal', title: 'Pessoais', subtitle: 'Projetos por conta própria', color: '#F43F5E' }
   ];
 
-  // Cada área tem uma cor, usada nos filtros, no mapa e nos cards.
   Portfolio.areaColors = {
     dev: '#3A2EE8',
     ia: '#7C4DFF',
@@ -186,9 +172,6 @@
     },
 
     /* ===================== FACULDADE ===================== */
-
-
-
 
     {
       id: 'cortex',
@@ -663,7 +646,6 @@
     { id: 1, label: 'Fundamentos' }
   ];
 
-  // Ajuste os níveis (3, 2 ou 1) conforme sua experiência real.
   Portfolio.skills = [
     { group: 'Front-end', items: [['HTML5', 3], ['CSS3', 3], ['JavaScript', 3], ['Figma', 3], ['Swift / UIKit', 2], ['Flutter', 2]] },
     { group: 'Back-end e mobile', items: [['Java', 2], ['Python', 2], ['APIs REST', 2], ['Kotlin', 2], ['FastAPI', 1], ['Spring Boot', 1]] },
