@@ -141,7 +141,6 @@
 
   .card,
   .card-stack { flex-basis: 82vw; }
-  .card--feature { flex-basis: 86vw; }
   .carousel__btn { width: 40px; height: 40px; }
   .filter-panel { padding: var(--space-2); }
   .filter-row { grid-template-columns: 1fr; gap: 0.4rem; }
