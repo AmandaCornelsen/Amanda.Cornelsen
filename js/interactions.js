@@ -1,6 +1,3 @@
-/**
- * Interações visuais: mapa de áreas do hero e estado do cabeçalho.
- */
 (function (Portfolio) {
   'use strict';
 
@@ -13,10 +10,6 @@
     return node;
   }
 
-  /**
-   * Mapa de áreas: um nó central, as áreas ao redor e os projetos como pontos
-   * ligados à área principal de cada um. Clicar numa área filtra os projetos.
-   */
   function initGraph(onSelect) {
     const svg = document.querySelector('[data-graph]');
     if (!svg) return;
@@ -38,7 +31,6 @@
     const layer = { edges: el('g', { class: 'graph__edges' }), leaves: el('g', { class: 'graph__leaves' }), nodes: el('g', { class: 'graph__nodes' }) };
     Object.values(layer).forEach((g) => svg.appendChild(g));
 
-    // Posição das áreas em elipse, levemente irregular para não parecer um relógio.
     const areaNodes = areas.map((area, i) => {
       const angle = (i / areas.length) * Math.PI * 2 - Math.PI / 2 + (i % 2 ? 0.12 : -0.08);
       const r = i % 2 ? 170 : 195;
@@ -72,7 +64,6 @@
       };
     });
 
-    // Ligações do centro para as áreas.
     areaNodes.forEach((n) => {
       n.spoke = layer.edges.appendChild(el('line', { class: 'graph__spoke' }));
     });
@@ -85,7 +76,6 @@
     core.appendChild(coreText);
     layer.nodes.appendChild(core);
 
-    // Nós de área, acessíveis por teclado.
     areaNodes.forEach((n) => {
       const g = el('g', { class: 'graph__area', tabindex: '0', role: 'button', 'data-area': n.area.id, 'aria-label': `${n.area.label}: ${n.count} projetos. Filtrar.`, style: `--c:${Portfolio.areaColors[n.area.id]}` });
       const label = shortLabels[n.area.id] || n.area.label;
@@ -146,7 +136,6 @@
       line.setAttribute('y2', y2.toFixed(1));
     }
 
-    // Anima só quando visível e quando o usuário não pediu menos movimento.
     let frame = null;
     let visible = true;
     function loop(t) {
