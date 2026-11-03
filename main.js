@@ -79,7 +79,7 @@
     const stack = p.stack.slice(0, feature ? 5 : 3);
     const text = feature && p.problem ? p.problem : p.summary;
     const color = Portfolio.colorOf(p);
-    const classes = ['card', feature ? 'card--feature' : 'card--standard', hasImage ? '' : 'card--text'].filter(Boolean).join(' ');
+    const classes = ['card', feature ? 'card--feature' : 'card--standard', hasImage ? '' : textMode() === 'ilustracao' ? 'card--art' : 'card--text'].filter(Boolean).join(' ');
     return `
       <article class="${classes}" data-id="${p.id}" role="listitem" style="--accent:${color};view-transition-name:card-${p.id}">
         ${hasImage ? `<div class="card__visual">${Portfolio.renderVisual(p)}</div>` : ''}
