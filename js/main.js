@@ -66,13 +66,13 @@
 
   function cardTemplate(p) {
     const hasImage = Boolean(p.cover);
-    const small = p.size === 'md' || p.size === 'half';
-    const size = hasImage || p.size === 'half' ? p.size : 'md';
-    const stack = p.stack.slice(0, small || !hasImage ? 3 : 5);
-    const text = small || !hasImage || !p.problem ? p.summary : p.problem;
+    const feature = hasImage && Boolean(p.featured);
+    const stack = p.stack.slice(0, feature ? 5 : 3);
+    const text = feature && p.problem ? p.problem : p.summary;
     const color = Portfolio.colorOf(p);
+    const classes = ['card', feature ? 'card--feature' : 'card--standard', hasImage ? '' : 'card--text'].filter(Boolean).join(' ');
     return `
-      <article class="card card--${size}${hasImage ? '' : ' card--text'}" data-id="${p.id}" style="--accent:${color};view-transition-name:card-${p.id}">
+      <article class="${classes}" data-id="${p.id}" role="listitem" style="--accent:${color};view-transition-name:card-${p.id}">
         ${hasImage ? `<div class="card__visual">${Portfolio.renderVisual(p)}</div>` : ''}
         <div class="card__body">
           <div class="card__meta">
@@ -89,21 +89,42 @@
       </article>`;
   }
 
+  // Ordem do carrossel: destaques primeiro, depois projetos com imagem, depois só texto.
+  function rank(p) {
+    if (p.featured) return 0;
+    return p.cover ? 1 : 2;
+  }
+
+  const arrow = (dir) =>
+    `<svg viewBox="0 0 24 24" width="20" height="20" aria-hidden="true"><path d="${dir === 'prev' ? 'M15 5l-7 7 7 7' : 'M9 5l7 7-7 7'}" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg>`;
+
   function renderProjects() {
     const root = $('[data-project-grid]');
     if (!root) return;
     root.innerHTML = Portfolio.groups
       .map((g) => {
-        const items = Portfolio.projects.filter((p) => p.group === g.id);
+        const items = Portfolio.projects
+          .filter((p) => p.group === g.id)
+          .map((p, i) => ({ p, i }))
+          .sort((a, b) => rank(a.p) - rank(b.p) || a.i - b.i)
+          .map(({ p }) => p);
         if (!items.length) return '';
         return `
           <section class="project-group" id="${g.id}" data-group="${g.id}" aria-labelledby="group-${g.id}" style="--group:${g.color}">
             <header class="project-group__head">
-              <h3 class="project-group__title" id="group-${g.id}">${escapeHTML(g.title)}</h3>
-              <span class="project-group__count">${items.length} projetos</span>
-              <p class="project-group__subtitle">${escapeHTML(g.subtitle)}</p>
+              <div class="project-group__label">
+                <h3 class="project-group__title" id="group-${g.id}">${escapeHTML(g.title)}</h3>
+                <span class="project-group__count" data-group-count>${items.length} projetos</span>
+                <p class="project-group__subtitle">${escapeHTML(g.subtitle)}</p>
+              </div>
+              <div class="carousel__nav">
+                <button class="carousel__btn" type="button" data-carousel-prev aria-label="Ver projetos anteriores de ${escapeHTML(g.title)}">${arrow('prev')}</button>
+                <button class="carousel__btn" type="button" data-carousel-next aria-label="Ver mais projetos de ${escapeHTML(g.title)}">${arrow('next')}</button>
+              </div>
             </header>
-            <div class="project-grid">${items.map(cardTemplate).join('')}</div>
+            <div class="carousel" data-carousel>
+              <div class="carousel__track" role="list" tabindex="0" aria-label="Projetos de ${escapeHTML(g.title)}">${items.map(cardTemplate).join('')}</div>
+            </div>
           </section>`;
       })
       .join('');
@@ -112,6 +133,46 @@
       const trigger = e.target.closest('[data-open]');
       if (trigger) openProject(trigger.dataset.open, trigger);
     });
+
+    initCarousels();
+  }
+
+  /* ---------- Carrosséis ---------- */
+  function updateCarousel(group) {
+    const track = $('.carousel__track', group);
+    const max = track.scrollWidth - track.clientWidth;
+    const atStart = track.scrollLeft <= 4;
+    const atEnd = track.scrollLeft >= max - 4;
+    $('[data-carousel-prev]', group).disabled = atStart;
+    $('[data-carousel-next]', group).disabled = atEnd;
+    const wrap = $('[data-carousel]', group);
+    wrap.classList.toggle('can-prev', !atStart);
+    wrap.classList.toggle('can-next', !atEnd);
+  }
+
+  function initCarousels() {
+    $$('[data-group]').forEach((group) => {
+      const track = $('.carousel__track', group);
+      const step = (dir) => {
+        // Avança quase uma tela de cards por clique.
+        track.scrollBy({ left: dir * track.clientWidth * 0.85, behavior: reduceMotion() ? 'auto' : 'smooth' });
+      };
+      $('[data-carousel-prev]', group).addEventListener('click', () => step(-1));
+      $('[data-carousel-next]', group).addEventListener('click', () => step(1));
+      track.addEventListener('keydown', (e) => {
+        if (e.target !== track) return;
+        if (e.key === 'ArrowRight') { e.preventDefault(); step(1); }
+        if (e.key === 'ArrowLeft') { e.preventDefault(); step(-1); }
+      });
+      let ticking = false;
+      track.addEventListener('scroll', () => {
+        if (ticking) return;
+        ticking = true;
+        requestAnimationFrame(() => { updateCarousel(group); ticking = false; });
+      }, { passive: true });
+      updateCarousel(group);
+    });
+    window.addEventListener('resize', () => $$('[data-group]').forEach(updateCarousel));
   }
 
   /* ---------- Filtros ---------- */
@@ -147,7 +208,11 @@
         if (match) shown += 1;
       });
       $$('[data-group]').forEach((group) => {
-        group.hidden = !$$('.card', group).some((c) => !c.hidden);
+        const visible = $$('.card', group).filter((c) => !c.hidden).length;
+        group.hidden = visible === 0;
+        $('[data-group-count]', group).textContent = `${visible} ${visible === 1 ? 'projeto' : 'projetos'}`;
+        $('.carousel__track', group).scrollLeft = 0;
+        updateCarousel(group);
       });
       const label = Portfolio.categories.find((c) => c.id === id).label;
       const status = $('[data-filter-status]');

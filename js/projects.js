@@ -32,6 +32,7 @@
     /* ===================== ESTÁGIO ===================== */
     {
       id: 'interagente',
+      featured: true,
       group: 'estagio',
       name: 'Interagente',
       kind: 'IA / Landing page e agente de atendimento',
@@ -166,7 +167,7 @@
         'Pendências com responsável e prazo, vindas das atas',
         'Painel e planilhas criados para organizar o acompanhamento'
       ],
-      stack: ['Gestão de projetos', 'HTML/JS', 'Excel', 'Google Sheets'],
+      stack: ['Gestão de projetos', 'HTML/JS', 'Excel'],
       disclaimer: 'A representação usa nomes e dados fictícios.',
       links: []
     },
@@ -175,6 +176,7 @@
 
     {
       id: 'cortex',
+      featured: true,
       group: 'faculdade',
       name: 'Cortex',
       kind: 'TCC / IA em saúde',
@@ -209,6 +211,7 @@
     },
     {
       id: 'one-hub',
+      featured: true,
       group: 'faculdade',
       name: 'Claro One Hub',
       kind: 'Empresa parceira / Atendimento omnichannel',
@@ -268,6 +271,7 @@
     },
     {
       id: 'inovaeuro',
+      featured: true,
       group: 'faculdade',
       name: 'InovaEuro',
       kind: 'Empresa parceira / App Flutter',
@@ -425,6 +429,7 @@
     },
     {
       id: 'spectra-ctf',
+      featured: true,
       group: 'faculdade',
       name: 'SPECTRA CTF',
       kind: 'Cibersegurança / CTF',
@@ -608,6 +613,7 @@
     },
     {
       id: 'mario-interface',
+      featured: true,
       group: 'pessoal',
       name: 'Página inspirada em Mario Bros',
       kind: 'Front-end / Interface',
