@@ -36,8 +36,6 @@ python -m http.server 8000
 
 ## Como personalizar
 
-**Cards sem imagem** — em `js/config.js`, `textCards: 'ilustracao'` mostra uma ilustração do assunto; `'empilhado'` deixa os cards menores, dois por coluna.
-
 **Contato** — edite `js/config.js`. Preencha a URL do LinkedIn (está vazia de propósito). Links vazios não aparecem no site.
 
 **Projetos** — edite `js/projects.js`. Cada projeto tem:
