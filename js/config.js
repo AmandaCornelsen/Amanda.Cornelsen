@@ -10,7 +10,7 @@ window.Portfolio.config = {
   email: 'amandacornelsen.c@gmail.com',
   links: [
     // Preencha com a URL completa do seu perfil, ex.: https://www.linkedin.com/in/seu-usuario
-    { id: 'linkedin', label: 'LinkedIn', url: '' },
+    { id: 'linkedin', label: 'LinkedIn', url: 'www.linkedin.com/in/amanda-cornelsen' },
     { id: 'github', label: 'GitHub', url: 'https://github.com/AmandaCornelsen' }
   ]
 };
